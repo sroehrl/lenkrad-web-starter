@@ -1,0 +1,15 @@
+$displays: ("block", "inline-block", "flex", "inline-flex");
+
+@each $display in $displays {
+  .#{$display}{
+    display: unquote($display);
+  }
+}
+
+$positions: ("absolute", "sticky", "fixed", "relative");
+
+@each $position in $positions {
+  .#{$position}{
+    position: unquote($position);
+  }
+}

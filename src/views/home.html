@@ -1,0 +1,282 @@
+<section class="relative mt-4">
+    <div class="scroll-spy fixed right-4 bottom-12">
+        <button class="button-primary" onclick="backToTop()">Back To Top</button>
+    </div>
+    <h1>Jump right in!</h1>
+    <div class="flex flex-wrap gap-3">
+        <div>
+            <a href="#bundled" class="button-neutral-light" >What's bundled?</a>
+        </div>
+        <div>
+            <a href="#create-route" class="button-neutral-light" >Creating routes</a>
+        </div>
+        <div>
+            <a href="#setup-changes" class="button-neutral-light" >Create your setup</a>
+        </div>
+        <div>
+            <a href="#docs" class="button-neutral-light" >LENKRAD docs</a>
+        </div>
+    </div>
+
+    <h2 id="bundled" class="pt-5">What's bundled?</h2>
+    <h3>Styling</h3>
+    <p>
+        We created a very basic CSS-framework with SASS. We assume you will want to choose the setup of your choice, but didn't want this
+        demo-page to look completely raw. If you are a minimalist as well, feel free to explore the folder <em>public/scss</em>.
+        We started a setup for basic needs you can work on, including:
+    </p>
+    <ul>
+        <li>text & background utility classes (e.g. <em>text-primary</em> or <em>bg-warning</em>)</li>
+        <li>blockquotes & code styles</li>
+        <li>buttons (e.g. <em>button-secondary</em> or <em>button-neutral-light</em>)</li>
+        <li>typography</li>
+        <li>responsive grid-system (e.g. <em>grid md:grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-4</em>)</li>
+        <li>mixins for colors & breakpoints</li>
+        <li>utilities for margin & padding (e.g. <em>p-5 mt-5</em>)</li>
+    </ul>
+    <h3>Custom CLI command</h3>
+    <p>
+        As LENKRAD allows for custom commands, we included <em>configuration/WebRouteCommand.php</em> in order to enable
+        fast prototyping of new endpoints. See <a href="#create-route">How to create a route</a> for usage.
+    </p>
+    <h3>Controller override</h3>
+    <p>
+        In <em>.templates</em>, you will notice that we utilized the CLI-tool's ability to create custom templates.
+        YOu can make changes to the template-files according to your needs.
+    </p>
+    <h3>Simple layout/frame</h3>
+    <p>
+        You will find the skeletons in <em>configuration/views</em>.
+    </p>
+    <blockquote>
+        REMEMBER: You can also change the used skeleton on the fly from a controller via <code>Renderer::setHtmlSkeleton</code>,
+        should you want to use multiple skeletons in your project.
+
+    </blockquote>
+    
+    <h2 id="create-route" class="pt-5">How to create a route?</h2>
+    <p>
+        Run <code>php cli create:webroute App\First\Endpoint</code> in your terminal from this project's root directory.
+    </p>
+    <p class="mt-5">
+        Creates the endpoint <em>"/endpoint"</em> in <em>"src/First/Endpoint.php"</em> and the
+        view <em>"src/views/endpoint.html"</em>
+    </p>
+    <pre><code class="language-php">
+namespace App\First;
+
+use Neoan\Routing\Interfaces\Routable;
+use Neoan\Routing\Attributes\Web;
+use Neoan\Store\Store;
+
+// This defines the web-route (here "endpoint") and the view (here endpoint.html)
+#[Web('/endpoint', '/endpoint.html')]
+class Endpoint implements Routable
+{
+    public function __invoke(): array
+    {
+        // Overriding the default page-title for "/configuration/views/layout.html"
+        Store::write('pageTitle', 'Endpoint');
+
+        // Passing information to render "src/views/endpoint.html"
+        return ['name' => 'Endpoint'];
+    }
+}
+</code></pre>
+    <p>
+        There are no restrictions to regular LENKRAD functionality, so look at the generated code more like a boilerplate
+        to start working with:
+    </p>
+    <pre><code class="language-php">
+namespace App\First;
+
+use Neoan\Routing\Interfaces\Routable;
+use Neoan\Request\Request;
+use Neoan\Routing\Attributes\Web;
+use Neoan\Store\Store;
+use Neoan\NeoanApp;
+
+// add an optional parameter :name
+#[Web('/endpoint/:name*', '/endpoint.html')]
+class Endpoint implements Routable
+{
+    // Auto-wired dependency injections are possible
+    public function __invoke(NeoanApp $app): array
+    {
+        // Use the parameter as declared in the attribute &
+        // capture the query parameters
+        return [
+            'name'  => Request::getParameter('name') ?? 'No parameter given',
+            'query' => Request::getQueries()
+        ];
+    }
+}
+</code></pre>
+    <h2 id="setup-changes" class="pt-5">How do I set this up for me?</h2>
+    <p>
+        This package is designed to get you started without any setup.
+        However, there are common setup steps you might consider:
+    </p>
+    <h3>Database</h3>
+    <p>
+        Visit <em>configuration/Loader.php</em> to set up database connection:
+    </p>
+    <pre><code class="language-php">
+namespace Configuration;
+
+use Neoan\Database\Database;
+use Neoan\Helper\Env;
+use Neoan\NeoanApp;
+use Neoan\Render\Renderer;
+use Neoan\Routing\AttributeRouting;
+use Neoan\Store\Store;
+
+class Loader
+{
+    public function __invoke(NeoanApp $app): self
+    {
+        $app->invoke(new AttributeRouting('App'));
+        $this->templating($app);
+
+        // call the database method
+        $this->database();
+        return $this;
+    }
+    private function templating(NeoanApp $app): void
+    {
+        Store::write('pageTitle', 'My App');
+        Renderer::setTemplatePath('src/views');
+        Renderer::setHtmlSkeleton('configuration/views/layout.html', 'main', [
+            'title' => Store::dynamic('pageTitle'),
+            'webPath' => $app->webPath
+        ]);
+    }
+    private function database(): void
+    {
+        /*
+        * You can use (or write) any Adapter compatible with \Neoan\Database\Adapter
+        * This package ships with two Adapters
+        */
+
+        // SQLite
+
+        /*
+        * In your .env-file:
+        *   DB_LOCATION="/your/path/db.db"
+        */
+        $adapter = new Neoan\Database\SqLiteAdapter([
+            'location' => Env::get('DB_LOCATION', __DIR__ . '/database.db')
+        ]);
+
+        // or MySQL / MariaDB
+
+        /*
+        * In your .env-file:
+        *   DB_HOST="your.host"
+        *   DB_NAME="my_database"
+        *   DB_USER="db_user"
+        *   DB_PASSWORD="****"
+        *   DB_PORT=3306
+        */
+
+        $adapter = new NeoanIo\MarketPlace\DatabaseAdapter([
+            'host' => Env::get('DB_HOST', 'localhost'),
+            'name' => Env::get('DB_NAME', 'neoan_io'),
+            'port' => Env::get('DB_PORT', 3306),
+            'user' => Env::get('DB_USER', 'root'),
+            'password' => Env::get('DB_PASSWORD', ''),
+            'charset' => Env::get('DB_CHARSET', 'utf8mb4'),
+            'casing' => Env::get('DB_CASING', 'camel'),
+            'assumes_uuid' => Env::get('DB_UUID', false),
+        ]);
+
+        // finally, initialize your database connection
+        Database::connect($adapter);
+    }
+}
+</code></pre>
+    <h3>Theming</h3>
+    <p>
+        If you opt to use the existing CSS-solution, you can change use SASS to recompile the file <em>public/scss/style.scss</em>
+        into <em>public/style.css</em>after making your changes. <br>
+        The SCSS code should be self-explanatory and both breakpoints & colors are exposed on the entry file itself.
+    </p>
+    <pre><code class="language-scss">
+// change, add or remove colors
+$colors: (
+        "primary": #81BECE,
+        "secondary": #27b3e1,
+        "warning": #ca921a,
+        "danger": #bc2828,
+        "smug": #f1f1f1,
+        "white": #f8f8f8,
+        "neutral" : #373737,
+        "body": #606c76
+);
+// change, add or remove breakpoints
+$breakPoints: (
+        "sm": 544px,
+        "md": 960px,
+        "lg": 1025px,
+        "xl": 1280px
+);
+/* Import what you need */
+
+
+
+// enables color shades (e.g. 'primary-light' or 'primary-dark')
+@import "colors";
+
+// enables display & position behavior (e.g. 'absolute' or 'block')
+@import "behavior";
+
+// basic element behavior of headlines, body etc
+@import "elements";
+
+// enables button-styles
+@import "button";
+
+// enables background-classes based on colors (e.g. 'bg-primary')
+@import "background";
+
+// enables text-classes based on colors (e.g. 'text-neutral'),
+// sizes (e.g. 'font-sm') and alignments (e.g. 'text-center')
+@import "text";
+
+// enables spacing (e.g. 'mt-15') and positioning (e.g. 'bottom-4') utilities
+@import "spacing";
+
+// enables simple grid (e.g. 'grid lg:grid-cols-4 gap-4')
+// and flex (e.g. 'flex flex-wrap') behavior
+@import "grid-flex";
+
+// if you want to enable classes other than grid to be breakpoint-dependent,
+// you can use our breakpoint mixin
+@import mixins;
+
+@include mapBreakPoints("font-lg"){
+    @extend .font-lg;
+}
+    </code></pre>
+    <p>
+        Going for bootstrap, tailwind or something you are married to? Simply setup the file
+        <em>configuration/views/fresh.html</em> according to your needs and make the following changes to
+        <em>configuration/Loader.php</em>
+    </p>
+    <pre><code class="language-php">
+...
+Renderer::setHtmlSkeleton('configuration/views/fresh.html', 'main', [
+    'title' => Store::dynamic('pageTitle'),
+    'webPath' => $app->webPath,
+     ...
+]);
+...
+    </code></pre>
+    <h2 id="docs" class="pt-5">What is LENKRAD?</h2>
+    <p>
+        LENKRAD is a lightweight, secure, and fast PHP framework for PHP8.1+. <br>
+        You can visit the <a href="https://github.com/sroehrl/neoan.io-lenkrad-core#readme">LENKRAD Github page</a>
+        for a full picture.
+    </p>
+
+</section>

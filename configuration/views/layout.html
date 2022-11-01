@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{title}}</title>
+    <base href="{{webPath}}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+
+    <!-- CSS Reset -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+
+    <!-- Prism Code highlighter -->
+
+    <link rel="stylesheet" href="prism/prism.css">
+    
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-smug">
+<header class="bg-primary text-white p-4 fixed w-5/5 top-0 z-1">
+<div class="font-xl text-center">Minimalistic LENKRAD Starter Project</div>
+</header>
+<main class="bg-white p-7" style="width: 70%; max-width: 960px; margin: 7rem auto 0; box-shadow: 1px 1px 4px #787878">{{main}}</main>
+
+<script src="prism/prism.js" ></script>
+
+<script>
+    // primitive scroll-spy
+    class ScrollSpy{
+        constructor(element) {
+            this.element = element
+            this.element.style.display = "none"
+            window.onscroll = () => {
+                this.element.style.display = (document.body.scrollTop > 30 || document.documentElement.scrollTop > 30) ? "block" : "none"
+            }
+        }
+    }
+    function backToTop(){
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+    }
+    document.querySelectorAll('.scroll-spy').forEach(element => {
+        new ScrollSpy(element)
+    })
+
+</script>
+
+
+
+
+</body>
+</html>

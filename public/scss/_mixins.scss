@@ -1,0 +1,16 @@
+
+@mixin forBreakPoint($width){
+  @media screen and (min-width: #{$width}) {
+    @content;
+  }
+}
+
+@mixin mapBreakPoints($ruleName){
+  @each $name, $value in $breakPoints{
+    @include forBreakPoint($value) {
+      .#{$name}\:#{$ruleName} {
+        @content;
+      }
+    }
+  }
+}

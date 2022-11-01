@@ -1,0 +1,24 @@
+$colors: (
+        "primary": #81BECE,
+        "secondary": #27b3e1,
+        "warning": #ca921a,
+        "danger": #bc2828,
+        "smug": #f1f1f1,
+        "white": #f8f8f8,
+        "neutral" : #373737,
+        "body": #606c76
+);
+$breakPoints: (
+        "sm": 544px,
+        "md": 960px,
+        "lg": 1025px,
+        "xl": 1280px
+);
+@import "colors";
+@import "behavior";
+@import "elements";
+@import "button";
+@import "background";
+@import "text";
+@import "spacing";
+@import "grid-flex";
