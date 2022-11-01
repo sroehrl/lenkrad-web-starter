@@ -13,7 +13,7 @@
 
 `php dev`
 
-> This repository is set up as a template, so easy cloning is possible as well
+> This repository is set up as a template, so easy cloning is possible as well [use as template](https://github.com/sroehrl/lenkrad-web-starter/generate)
 
 ## Documentation
 
