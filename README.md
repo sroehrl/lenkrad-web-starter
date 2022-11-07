@@ -19,4 +19,4 @@
 
 This project explains itself on the demo-page it provides when running it.
 
-Please refer to [LENKRAD](https://github.com/sroehrl/neoan.io-lenkrad-core#readme) for a full documentation.
+Please refer to the [LENKRAD-docs](https://lenkrad.neoan3.rocks) for a full documentation.
