@@ -7,6 +7,9 @@ $root = dirname(__DIR__);
 
 require_once $root . '/vendor/autoload.php';
 
-$app = new NeoanApp($root . '/src', __DIR__ , $root);
+$setup = (new \Neoan\Helper\Setup())->setPublicPath(__DIR__)->setLibraryPath($root . '/src');
+
+
+$app = new NeoanApp($setup , $root);
 $app->invoke(new Loader());
 $app->run();
